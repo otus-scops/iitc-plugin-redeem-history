@@ -51,7 +51,7 @@ var wrapper = function(plugin_info) {
 
     /* プラグイン内でグローバルに用いる定数や変数の定義 */
     const storedDays = 30; // 履歴を保持する日数
-    const STORAGE_KEY = 'plugins-RedeemHistory'; // localStorageのキー名
+    const STORAGE_KEY = 'plugin-redeem-history'; // localStorageのキー名
 
     // 設定値の保持用
     let RedeemData = {};
