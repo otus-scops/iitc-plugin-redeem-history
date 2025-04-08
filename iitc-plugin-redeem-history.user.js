@@ -6,8 +6,8 @@
 // @author         otusscops
 // @namespace      iitc-plugin-redeem-history
 // @description    Record redeem history
-// @downloadURL    https://github.com/otus-scops/iitc-plugin-redeem-history/raw/refs/heads/main/iitc-plugin-redeem-history.user.js
-// @updateURL      https://github.com/otus-scops/iitc-plugin-redeem-history/raw/refs/heads/main/iitc-plugin-redeem-history.user.js
+// @downloadURL    https://github.com/otus-scops/iitc-plugin-redeem-history/raw/master/src/iitc-plugin-redeem-history.user.js
+// @updateURL      https://github.com/otus-scops/iitc-plugin-redeem-history/raw/master/src/iitc-plugin-redeem-history.user.js
 // @include        https://*.ingress.com/*
 // @include        http://*.ingress.com/*
 // @match          https://*.ingress.com/*
@@ -224,7 +224,6 @@ var wrapper = function(plugin_info) {
         const keyword = document.querySelector('#redeemHistory-filter').value;
         const regex = new RegExp(keyword, 'i');
         const rows = document.querySelectorAll('#iitc-plugin-redeemHistory-table tbody tr.redeemData');
-        console.log(rows, rows.length);
         let count = 0;
         for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
