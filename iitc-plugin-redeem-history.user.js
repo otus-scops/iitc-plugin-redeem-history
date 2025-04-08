@@ -6,8 +6,8 @@
 // @author         otusscops
 // @namespace      iitc-plugin-redeem-history
 // @description    Record redeem history
-// @downloadURL    https://github.com/otus-scops/iitc-plugin-redeem-history/raw/master/src/iitc-plugin-redeem-history.user.js
-// @updateURL      https://github.com/otus-scops/iitc-plugin-redeem-history/raw/master/src/iitc-plugin-redeem-history.user.js
+// @downloadURL    https://github.com/otus-scops/iitc-plugin-redeem-history/raw/refs/heads/main/iitc-plugin-redeem-history.user.js
+// @updateURL      https://github.com/otus-scops/iitc-plugin-redeem-history/raw/refs/heads/main/iitc-plugin-redeem-history.user.js
 // @include        https://*.ingress.com/*
 // @include        http://*.ingress.com/*
 // @match          https://*.ingress.com/*
