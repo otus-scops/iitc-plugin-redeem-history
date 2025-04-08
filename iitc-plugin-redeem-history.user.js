@@ -2,7 +2,7 @@
 // @id             iitc-plugin-redeem-history@otusscops
 // @name           IITC Plugin: Redeem History
 // @category       Information
-// @version        0.1.0.20250408.1340
+// @version        0.1.0.20250408.1400
 // @author         otusscops
 // @namespace      iitc-plugin-redeem-history
 // @description    Record redeem history
@@ -36,7 +36,7 @@ var wrapper = function(plugin_info) {
     if(typeof window.plugin !== 'function') window.plugin = function() {};
 
     plugin_info.buildName = 'iitc-ja-otusscops'; // Name of the IITC build for first-party plugins
-    plugin_info.dateTimeVersion = '202504081340'; // Datetime-derived version of the plugin
+    plugin_info.dateTimeVersion = '202504081400'; // Datetime-derived version of the plugin
     plugin_info.pluginId = 'RedeemHistory'; // ID/name of the plugin
     // ensure plugin framework is there, even if iitc is not yet loaded
     if (typeof window.plugin !== "function") window.plugin = function () { };
@@ -56,7 +56,7 @@ var wrapper = function(plugin_info) {
     // 設定値の保持用
     let RedeemData = {};
 
-    self.LoggingRedeemHistory = function(data, textStatus, jqXHR) {
+    self.loggingRedeemHistory = function(data, textStatus, jqXHR) {
         //console.log(data, textStatus, jqXHR);
         let status;
         let statusString;
@@ -261,7 +261,7 @@ var wrapper = function(plugin_info) {
 		let originalRedeemResponse = handleRedeemResponse;
 		window.handleRedeemResponse = function (data, textStatus, jqXHR) {
 			originalRedeemResponse(data, textStatus, jqXHR);
-            self.LoggingRedeemHistory(data, textStatus, jqXHR);
+            self.loggingRedeemHistory(data, textStatus, jqXHR);
             self.cleanHistory();
             self.saveOption();
 		}
