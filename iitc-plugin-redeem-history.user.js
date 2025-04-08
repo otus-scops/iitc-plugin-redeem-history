@@ -2,7 +2,7 @@
 // @id             iitc-plugin-redeem-history@otusscops
 // @name           IITC Plugin: Redeem History
 // @category       Information
-// @version        0.1.0.20250408.1800
+// @version        0.1.0.20250409.0900
 // @author         otusscops
 // @namespace      iitc-plugin-redeem-history
 // @description    Record redeem history
@@ -36,7 +36,7 @@ var wrapper = function(plugin_info) {
     if(typeof window.plugin !== 'function') window.plugin = function() {};
 
     plugin_info.buildName = 'iitc-ja-otusscops'; // Name of the IITC build for first-party plugins
-    plugin_info.dateTimeVersion = '202504081800'; // Datetime-derived version of the plugin
+    plugin_info.dateTimeVersion = '202504099000'; // Datetime-derived version of the plugin
     plugin_info.pluginId = 'RedeemHistory'; // ID/name of the plugin
     // ensure plugin framework is there, even if iitc is not yet loaded
     if (typeof window.plugin !== "function") window.plugin = function () { };
@@ -80,11 +80,6 @@ var wrapper = function(plugin_info) {
             "status": status,   // 成功 ture/失敗 false
             "statusString": statusString,
             "rewards": rewards
-        }
-
-        // ダイアログが開いているときには再表示
-        if(dialog){
-            self.openHistory();
         }
     };
 
@@ -175,7 +170,7 @@ var wrapper = function(plugin_info) {
                 statusString = "FR";
             }
             let rewards = RedeemData[timestamp].rewards;
-            let rewardString = self.createRewardString(rewards);'';
+            let rewardString = (status)?self.createRewardString(rewards):'';
             html += `
                     <tr class="redeemData">
                         <td>${code}</td>
