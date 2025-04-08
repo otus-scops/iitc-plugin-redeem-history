@@ -171,9 +171,9 @@ var wrapper = function(plugin_info) {
             let statusString = RedeemData[timestamp].statusString;
             if(statusString.match(/Invalid/)){
                 statusString = "Invalid";
-            }else if(statusString.match(/Already/)){
+            }else if(statusString.match(/already/)){
                 statusString = "AR";
-            }else if(statusString.match(/Fully/)){
+            }else if(statusString.match(/fully/)){
                 statusString = "FR";
             }
             let rewards = RedeemData[timestamp].rewards;
