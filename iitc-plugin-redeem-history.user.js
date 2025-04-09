@@ -81,6 +81,11 @@ var wrapper = function(plugin_info) {
             "statusString": statusString,
             "rewards": rewards
         }
+
+        // ダイアログが開いているときは再表示
+        if(document.querySelector("#dialog-redeemHistoryDialog")){
+            self.openHistory();
+        }
     };
 
 	// エンドポイントから起動される初期処理用
