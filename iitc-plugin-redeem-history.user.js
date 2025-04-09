@@ -2,7 +2,7 @@
 // @id             iitc-plugin-redeem-history@otusscops
 // @name           IITC Plugin: Redeem History
 // @category       Information
-// @version        0.1.0.20250409.1000
+// @version        0.1.0.20250409.1100
 // @author         otusscops
 // @namespace      iitc-plugin-redeem-history
 // @description    Record redeem history
@@ -36,7 +36,7 @@ var wrapper = function(plugin_info) {
     if(typeof window.plugin !== 'function') window.plugin = function() {};
 
     plugin_info.buildName = 'iitc-ja-otusscops'; // Name of the IITC build for first-party plugins
-    plugin_info.dateTimeVersion = '202504091000'; // Datetime-derived version of the plugin
+    plugin_info.dateTimeVersion = '202504091100'; // Datetime-derived version of the plugin
     plugin_info.pluginId = 'RedeemHistory'; // ID/name of the plugin
     // ensure plugin framework is there, even if iitc is not yet loaded
     if (typeof window.plugin !== "function") window.plugin = function () { };
@@ -185,10 +185,6 @@ var wrapper = function(plugin_info) {
                     </tr>
                 `;
         // 履歴の表示
-        if(times.length < 1){
-            html += `
-                `;
-        }
         for (let i = 0; i < times.length; i++) {
             let timestamp = times[i];
             let code = RedeemData[timestamp].code;
@@ -274,6 +270,22 @@ var wrapper = function(plugin_info) {
 
         /* ツールボックスの項目追加 */
         $('#toolbox').append('<a onclick="javascript:window.plugin.redeemHistory.openHistory();">redeem履歴</a>');
+        // redeem keypressのフック
+        let redeemEvents = $._data($("#redeem").get(0), "events");
+        let originalKeypressHandler  = redeemEvents.keypress[0].handler;
+        $("#redeem").off("keypress", originalKeypressHandler);
+        $("#redeem").on("keypress", function (e) {
+            if (e.keyCode === 13) {
+                let code = $(this).val();
+                // Invalid履歴がある場合は、継続を確認
+                if(!self.checkInvalidHistory(code)){
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            originalKeypressHandler.call(this, e);
+        });
+        // redeem responseのフック
 		let originalRedeemResponse = handleRedeemResponse;
 		window.handleRedeemResponse = function (data, textStatus, jqXHR) {
 			originalRedeemResponse(data, textStatus, jqXHR);
