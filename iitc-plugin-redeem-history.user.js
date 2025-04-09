@@ -2,7 +2,7 @@
 // @id             iitc-plugin-redeem-history@otusscops
 // @name           IITC Plugin: Redeem History
 // @category       Information
-// @version        0.1.0.20250409.0900
+// @version        0.1.0.20250409.1000
 // @author         otusscops
 // @namespace      iitc-plugin-redeem-history
 // @description    Record redeem history
@@ -36,7 +36,7 @@ var wrapper = function(plugin_info) {
     if(typeof window.plugin !== 'function') window.plugin = function() {};
 
     plugin_info.buildName = 'iitc-ja-otusscops'; // Name of the IITC build for first-party plugins
-    plugin_info.dateTimeVersion = '202504099000'; // Datetime-derived version of the plugin
+    plugin_info.dateTimeVersion = '202504091000'; // Datetime-derived version of the plugin
     plugin_info.pluginId = 'RedeemHistory'; // ID/name of the plugin
     // ensure plugin framework is there, even if iitc is not yet loaded
     if (typeof window.plugin !== "function") window.plugin = function () { };
@@ -104,6 +104,22 @@ var wrapper = function(plugin_info) {
         }
     };
 
+    // Invalidの履歴がないかチェック
+    self.checkInvalidHistory = function(inCode){
+        inCode = inCode.toLowerCase();
+        let times = Object.keys(RedeemData);
+        for (let i = 0; i < times.length; i++) {
+            let timestamp = times[i];
+            let code = RedeemData[timestamp].code.toLowerCase();
+            let statusString = self.failedStatusString(RedeemData[timestamp].statusString);
+            if(code === inCode){
+                // Invalid履歴がある場合は、継続を確認
+                return confirm(`${RedeemData[timestamp].dateTime}に\n[ ${RedeemData[timestamp].code} ]は${statusString}です。\nRedeemを継続しますか？`);
+            }
+        }
+        return true; // 無効履歴がない場合はtrueを返す
+    }
+
     // 設定の読み込み
     self.loadOption = function(){
         let stream = localStorage.getItem(STORAGE_KEY);
@@ -116,6 +132,18 @@ var wrapper = function(plugin_info) {
     self.saveOption = function(){
         let stream = JSON.stringify(RedeemData);
         localStorage.setItem(STORAGE_KEY,stream);
+    };
+
+    self.failedStatusString = function(statusString) {
+        if(statusString.match(/Invalid/)){
+            return "Invalid";
+        }else if(statusString.match(/already/)){
+            return "AR";
+        }else if(statusString.match(/fully/)){
+            return "FR";
+        }else{
+            return statusString;
+        }
     };
 
     self.openHistory = function() {
@@ -166,14 +194,7 @@ var wrapper = function(plugin_info) {
             let code = RedeemData[timestamp].code;
             let dateTime = RedeemData[timestamp].dateTime;
             let status = RedeemData[timestamp].status;
-            let statusString = RedeemData[timestamp].statusString;
-            if(statusString.match(/Invalid/)){
-                statusString = "Invalid";
-            }else if(statusString.match(/already/)){
-                statusString = "AR";
-            }else if(statusString.match(/fully/)){
-                statusString = "FR";
-            }
+            let statusString = self.failedStatusString(RedeemData[timestamp].statusString);
             let rewards = RedeemData[timestamp].rewards;
             let rewardString = (status)?self.createRewardString(rewards):'';
             html += `
