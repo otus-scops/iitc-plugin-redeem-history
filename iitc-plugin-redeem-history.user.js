@@ -2,7 +2,7 @@
 // @id             iitc-plugin-redeem-history@otusscops
 // @name           IITC Plugin: Redeem History
 // @category       Information
-// @version        0.2.0.20250410.1650
+// @version        0.2.0.20250410.1652
 // @author         otusscops
 // @namespace      iitc-plugin-redeem-history
 // @description    Record redeem history
@@ -36,7 +36,7 @@ var wrapper = function(plugin_info) {
     if(typeof window.plugin !== 'function') window.plugin = function() {};
 
     plugin_info.buildName = 'iitc-otusscops'; // Name of the IITC build for first-party plugins
-    plugin_info.dateTimeVersion = '202504101650'; // Datetime-derived version of the plugin
+    plugin_info.dateTimeVersion = '202504101652'; // Datetime-derived version of the plugin
     plugin_info.pluginId = 'RedeemHistory'; // ID/name of the plugin
     // ensure plugin framework is there, even if iitc is not yet loaded
     if (typeof window.plugin !== "function") window.plugin = function () { };
@@ -165,10 +165,10 @@ var wrapper = function(plugin_info) {
                         </th>
                     </tr>
                     <tr>
-                        <th>passcode</th>
-                        <th>datetime</th>
-                        <th>result</th>
-                        <th>aquired</th>
+                        <th>Passcode</th>
+                        <th>Datetime</th>
+                        <th>Result</th>
+                        <th>Acquired</th>
                     </tr>
                 </thead>
                 <tbody>
