@@ -2,7 +2,7 @@
 // @id             iitc-plugin-redeem-history@otusscops
 // @name           IITC Plugin: Redeem History
 // @category       Information
-// @version        0.1.0.20250409.1100
+// @version        0.2.0.20250410.1650
 // @author         otusscops
 // @namespace      iitc-plugin-redeem-history
 // @description    Record redeem history
@@ -35,8 +35,8 @@
 var wrapper = function(plugin_info) {
     if(typeof window.plugin !== 'function') window.plugin = function() {};
 
-    plugin_info.buildName = 'iitc-ja-otusscops'; // Name of the IITC build for first-party plugins
-    plugin_info.dateTimeVersion = '202504091100'; // Datetime-derived version of the plugin
+    plugin_info.buildName = 'iitc-otusscops'; // Name of the IITC build for first-party plugins
+    plugin_info.dateTimeVersion = '202504101650'; // Datetime-derived version of the plugin
     plugin_info.pluginId = 'RedeemHistory'; // ID/name of the plugin
     // ensure plugin framework is there, even if iitc is not yet loaded
     if (typeof window.plugin !== "function") window.plugin = function () { };
@@ -49,11 +49,9 @@ var wrapper = function(plugin_info) {
     let self = window.plugin.redeemHistory;
 
 
-    /* プラグイン内でグローバルに用いる定数や変数の定義 */
-    const storedDays = 30; // 履歴を保持する日数
-    const STORAGE_KEY = 'plugin-redeem-history'; // localStorageのキー名
+    const storedDays = 30; // days to keep history
+    const STORAGE_KEY = 'plugin-redeem-history';
 
-    // 設定値の保持用
     let RedeemData = {};
 
     self.loggingRedeemHistory = function(data, textStatus, jqXHR) {
@@ -64,12 +62,12 @@ var wrapper = function(plugin_info) {
         let timestamp = new Date().getTime();
         let dateTime = new Date(timestamp).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
         if(data.hasOwnProperty("error")){
-            // エラー時の処理
+            // redeem error
             status = false;
             statusString = data.error;
             rewards = "-";
         }else if(data.hasOwnProperty("rewards")){
-            // 成功時の処理
+            // redeem success
             status = true;
             statusString = "Success";
             rewards = data.rewards;
@@ -77,34 +75,32 @@ var wrapper = function(plugin_info) {
         RedeemData[timestamp] = {
             "code": code,
             "dateTime": dateTime,
-            "status": status,   // 成功 ture/失敗 false
+            "status": status,   // success=ture/failer=false
             "statusString": statusString,
             "rewards": rewards
         }
 
-        // ダイアログが開いているときは再表示
+        // if the dialog is open, refresh the history
         if(document.querySelector("#dialog-redeemHistoryDialog")){
             self.openHistory();
         }
     };
 
-	// エンドポイントから起動される初期処理用
-	// セットアップ以外の処理で、設定変更時等に再度コールされる想定
     self.init = function(){
 
     };
 
-    // 古い履歴の削除
+    // delete old history
     self.cleanHistory = function(){
         let times = Object.keys(RedeemData);
-        let limitTimestamp = new Date().getTime() - (storedDays * 24 * 60 * 60 * 1000); // storedDays日数分のミリ秒
+        let limitTimestamp = new Date().getTime() - (storedDays * 24 * 60 * 60 * 1000);
         let deleteKeys = times.filter(function(key) { return key < limitTimestamp; });
         for (let i = 0; i < deleteKeys.length; i++) {
             delete RedeemData[deleteKeys[i]];
         }
     };
 
-    // Invalidの履歴がないかチェック
+    // check for invalid history
     self.checkInvalidHistory = function(inCode){
         inCode = inCode.toLowerCase();
         let times = Object.keys(RedeemData);
@@ -113,14 +109,13 @@ var wrapper = function(plugin_info) {
             let code = RedeemData[timestamp].code.toLowerCase();
             let statusString = self.failedStatusString(RedeemData[timestamp].statusString);
             if(code === inCode){
-                // Invalid履歴がある場合は、継続を確認
+                // If found Invalid history, check for continuation
                 return confirm(`${RedeemData[timestamp].dateTime}に\n[ ${RedeemData[timestamp].code} ]は${statusString}です。\nRedeemを継続しますか？`);
             }
         }
-        return true; // 無効履歴がない場合はtrueを返す
+        return true; // return true if no invalid history found
     }
 
-    // 設定の読み込み
     self.loadOption = function(){
         let stream = localStorage.getItem(STORAGE_KEY);
         let _data = (stream === null) ? {} : JSON.parse(stream);
@@ -128,7 +123,6 @@ var wrapper = function(plugin_info) {
         self.cleanHistory();
     };
 
-    // 設定の保存
     self.saveOption = function(){
         let stream = JSON.stringify(RedeemData);
         localStorage.setItem(STORAGE_KEY,stream);
@@ -147,7 +141,7 @@ var wrapper = function(plugin_info) {
     };
 
     self.openHistory = function() {
-        // ダイアログが表示中の場合、位置を維持。
+        // id dialog is already open, get current position
         let myDialog = document.querySelector("#dialog-redeemHistoryDialog");
         let dialogParent, dialogTop, dialogLeft
         if (myDialog) {
@@ -158,7 +152,7 @@ var wrapper = function(plugin_info) {
 
         let times = Object.keys(RedeemData);
         times.sort(function(a, b) {
-            return b - a; // 降順にソート
+            return b - a; // order by timestamp descending
         });
         let html = `
             <table id="iitc-plugin-redeemHistory-table">
@@ -166,25 +160,25 @@ var wrapper = function(plugin_info) {
                     <tr>
                         <th colspan="4" style="text-align: right;">
                             <input type="text" placeholder="filter" id="redeemHistory-filter">
-                            <button id="appendRedeemHistoryFilter">検索</button>
-                            <button id="clearRedeemHistoryFilter">クリア</button>
+                            <button id="appendRedeemHistoryFilter">search</button>
+                            <button id="clearRedeemHistoryFilter">clear</button>
                         </th>
                     </tr>
                     <tr>
-                        <th>パスコード</th>
-                        <th>日時</th>
-                        <th>結果</th>
-                        <th>取得内容</th>
+                        <th>passcode</th>
+                        <th>datetime</th>
+                        <th>result</th>
+                        <th>aquired</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr id="redeemDisplayTargetNone" style="${times.length?"display:none;":"display:table-row;"}">
                         <td colspan="4" style="text-align: center;">
-                            対象履歴がありません。
+                            Redeem history is not found.
                         </td>
                     </tr>
                 `;
-        // 履歴の表示
+        // show redeem history
         for (let i = 0; i < times.length; i++) {
             let timestamp = times[i];
             let code = RedeemData[timestamp].code;
@@ -209,7 +203,7 @@ var wrapper = function(plugin_info) {
         dialog({
             html: html,
             id: 'redeemHistoryDialog',
-            title: 'redeem履歴',
+            title: 'RedeemHistory',
             width: 700,
             focusCallback: function() {
                 $('#appendRedeemHistoryFilter').on('click', self.filterRows);
@@ -221,7 +215,7 @@ var wrapper = function(plugin_info) {
             },
         });
 
-        // ダイアログの位置を保持
+        // restore dialog position
         if(myDialog){
             myDialog = document.querySelector("#dialog-redeemHistoryDialog");
             dialogParent = myDialog.parentNode;
@@ -265,19 +259,17 @@ var wrapper = function(plugin_info) {
 
     // The entry point for this plugin.
     self.start = async function() {
-        // 設定値の読み込み
         self.loadOption();
 
-        /* ツールボックスの項目追加 */
         $('#toolbox').append('<a onclick="javascript:window.plugin.redeemHistory.openHistory();">redeem履歴</a>');
-        // redeem keypressのフック
+        // hook #redeem keypress
         let redeemEvents = $._data($("#redeem").get(0), "events");
         let originalKeypressHandler  = redeemEvents.keypress[0].handler;
         $("#redeem").off("keypress", originalKeypressHandler);
         $("#redeem").on("keypress", function (e) {
             if (e.keyCode === 13) {
                 let code = $(this).val();
-                // Invalid履歴がある場合は、継続を確認
+                // if code is invalid in history, show confirm dialog
                 if(!self.checkInvalidHistory(code)){
                     e.preventDefault();
                     return false;
@@ -285,7 +277,7 @@ var wrapper = function(plugin_info) {
             }
             originalKeypressHandler.call(this, e);
         });
-        // redeem responseのフック
+        // hook redeem response
 		let originalRedeemResponse = handleRedeemResponse;
 		window.handleRedeemResponse = function (data, textStatus, jqXHR) {
 			originalRedeemResponse(data, textStatus, jqXHR);
@@ -319,7 +311,6 @@ var wrapper = function(plugin_info) {
         styleTag.innerText = cssData;
         document.getElementsByTagName('head')[0].insertAdjacentElement('beforeend', styleTag);
 
-        // 初期設定
         self.init()
     };
 
