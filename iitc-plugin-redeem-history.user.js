@@ -261,7 +261,7 @@ var wrapper = function(plugin_info) {
     self.start = async function() {
         self.loadOption();
 
-        $('#toolbox').append('<a onclick="javascript:window.plugin.redeemHistory.openHistory();">redeem履歴</a>');
+        $('#toolbox').append('<a onclick="javascript:window.plugin.redeemHistory.openHistory();">RedeemHistory</a>');
         // hook #redeem keypress
         let redeemEvents = $._data($("#redeem").get(0), "events");
         let originalKeypressHandler  = redeemEvents.keypress[0].handler;
